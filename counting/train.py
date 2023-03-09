@@ -157,8 +157,8 @@ def train(train_loader, net, criterion, optimizer, epoch):
         
         #show_image(input,target)
 
-        target = target.cuda(async=True)
-        input = input.cuda(async=True)
+        target = target.cuda(non_blocking=True)
+        input = input.cuda(non_blocking=True)
         input_var = torch.autograd.Variable(input)
         target_var = torch.autograd.Variable(target)
 
@@ -171,7 +171,7 @@ def train(train_loader, net, criterion, optimizer, epoch):
         correct = (target==idx)
         acc = float(correct.sum())/input.size(0)
 
-        losses.update(loss.data[0], input.size(0))
+        losses.update(loss.item(), input.size(0))
         train_acc.update(acc, input.size(0))
 
         # compute gradient and do SGD step
@@ -205,8 +205,8 @@ def validate(val_loader, net, criterion, file_out):
 
     end = time.time()
     for i, (input, target) in enumerate(val_loader):
-        target = target.cuda(async=True)
-        input = input.cuda(async=True)
+        target = target.cuda(non_blocking=True)
+        input = input.cuda(non_blocking=True)
         input_var = torch.autograd.Variable(input, volatile=True)
         target_var = torch.autograd.Variable(target, volatile=True)
 
@@ -221,10 +221,10 @@ def validate(val_loader, net, criterion, file_out):
 
         if file_out==True:
           for j in range(input.size(0)):
-            f.write('%d\n' % idx[j][0])
+            f.write('%d\n' % idx[j])
 
         # measure accuracy and record loss
-        losses.update(loss.data[0], input.size(0))
+        losses.update(loss.item(), input.size(0))
         val_acc.update(acc, input.size(0))
 
         # measure elapsed time
